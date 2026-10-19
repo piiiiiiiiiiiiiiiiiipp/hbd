@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Сюрприз для Киси Писи</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600;700&family=Caveat:wght@600;700&family=Pixelify+Sans:wght@600&display=swap">
+<style>
+/* Layout: one card per step over a pink-lilac wash; the cake step is a wide card with the cat + pixel cake stage on the left and controls on the right. Single light theme by design. */
+:root{
+  color-scheme: light;
+  --wash-a:#f4e4ee; --wash-b:#e7e1f5; --wash-c:#fbefe7;
+  --card:#fffcfa; --ink:#2b1820; --muted:#7c6570; --line:#ecdfe4; --soft:#fdf5f8;
+  --wine:#9b1c4c; --wine-deep:#7a1239; --blush:#f8dbe5; --gold:#e8b04b; --night:#1e1b3a;
+  --f-display:"Unbounded", "Arial Black", system-ui, sans-serif;
+  --f-body:"Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-hand:"Caveat", "Segoe Script", cursive;
+  --f-pixel:"Pixelify Sans", ui-monospace, monospace;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0; font-family:var(--f-body); color:var(--ink); font-size:14px;
+  background:var(--wash-a);
+  background-image:
+    radial-gradient(60% 50% at 15% 10%, var(--wash-c) 0%, transparent 70%),
+    radial-gradient(70% 60% at 90% 90%, var(--wash-b) 0%, transparent 70%),
+    linear-gradient(160deg, var(--wash-a), var(--wash-b));
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:32px;
+  display:flex; justify-content:center; align-items:flex-start;
+  overflow-x:hidden;
+}
+main{width:100%; max-width:880px; display:flex; flex-direction:column; align-items:center; gap:14px}
+.dots{display:flex; justify-content:center; gap:6px}
+.dots i{width:6px; height:6px; border-radius:50%; background:#e2cfd7; transition:background .3s, width .3s}
+.dots i.on{background:var(--wine); width:18px; border-radius:3px}
+
+.card{
+  width:100%; max-width:460px;
+  background:var(--card); border-radius:24px; padding:28px 24px 26px;
+  box-shadow:0 1px 0 rgba(255,255,255,.8) inset, 0 18px 50px -20px rgba(122,18,57,.28), 0 2px 6px rgba(43,24,32,.05);
+  display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;
+}
+.card.wide{max-width:880px}
+.screen{animation:fade .45s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.eyebrow{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--wine); font-weight:700}
+h1,h2{font-family:var(--f-display); color:var(--wine); margin:0; line-height:1.12; text-wrap:balance; font-weight:700; letter-spacing:-.01em}
+h1{font-size:clamp(26px, 5vw, 36px)}
+h2{font-size:clamp(22px, 4vw, 28px)}
+p{margin:0; line-height:1.55; color:var(--muted); max-width:42ch}
+.hand{font-family:var(--f-hand); font-weight:700; color:var(--wine); font-size:24px; line-height:1.1}
+
+.photo{
+  width:min(220px, 70%); aspect-ratio:4/3; max-width:100%;
+  border:1.5px dashed #d9b9c6; border-radius:14px; background:var(--soft);
+  display:grid; place-items:center; padding:12px; overflow:hidden;
+  font-size:12px; color:#a8899a; line-height:1.4;
+}
+.photo img{width:100%; height:100%; object-fit:cover; display:block}
+.photo.has-img{border:0; padding:0; aspect-ratio:auto; height:auto; background:none}
+.photo.has-img img{height:auto; object-fit:contain}
+.photo.wide{width:100%; aspect-ratio:16/10}
+
+.row{display:flex; align-items:center; justify-content:center; gap:18px; flex-wrap:wrap; min-height:64px; margin-top:4px}
+.yes{
+  --grow:1;
+  font:600 15px/1 var(--f-body); color:#fff; background:var(--wine);
+  border:0; border-radius:999px; padding:15px 26px;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px; cursor:pointer;
+  box-shadow:0 10px 24px -10px var(--wine);
+  transform:scale(var(--grow)); transition:transform .3s cubic-bezier(.3,1.6,.5,1), background .2s, opacity .2s;
+}
+.yes:hover{background:var(--wine-deep)}
+.yes:disabled{opacity:.4; cursor:default}
+.yes svg{width:16px; height:16px; fill:currentColor}
+.no{
+  font:500 12px/1 var(--f-body); color:var(--muted); background:#fff;
+  border:1px solid var(--line); border-radius:999px; padding:9px 14px; cursor:pointer;
+  transition:left .32s cubic-bezier(.2,.9,.3,1.2), top .32s cubic-bezier(.2,.9,.3,1.2), transform .3s;
+  white-space:nowrap; z-index:50;
+}
+.no.free{position:fixed}
+.spacer{visibility:hidden; display:inline-block}
+.note{font-size:12px; color:var(--muted); min-height:1.4em; line-height:1.45}
+button:focus-visible,input:focus-visible{outline:2px solid var(--wine); outline-offset:3px}
+.ghost{font:600 13px/1 var(--f-body); background:none; border:0; color:var(--wine); cursor:pointer; padding:8px; text-decoration:underline; text-underline-offset:3px}
+
+/* ---------- cake step ---------- */
+.cake-layout{display:grid; grid-template-columns:1fr; gap:22px; width:100%; align-items:start}
+@media (min-width:760px){ .cake-layout{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)} }
+.stage{position:relative; width:100%; touch-action:none; user-select:none; -webkit-user-select:none; cursor:none; border-radius:18px; overflow:hidden; background:var(--night)}
+.stage .cat{display:block; width:100%; aspect-ratio:736/1104; object-fit:cover; object-position:50% 0; transition:filter .6s}
+.stage.dark .cat{filter:brightness(.55) saturate(.9)}
+.stage .shade{position:absolute; inset:auto 0 0 0; height:32%; background:linear-gradient(transparent, rgba(30,27,58,.85)); pointer-events:none}
+.hat{position:absolute; left:44%; top:27%; width:27%; transform:translate(-50%,-100%) rotate(-16deg); transform-origin:50% 100%; pointer-events:none; filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.hat svg{display:block; width:100%; height:auto}
+.cake{position:absolute; left:50%; bottom:-16%; width:83%; transform:translateX(-50%)}
+.cake svg{display:block; width:100%; height:auto; overflow:visible}
+.cake .fl{opacity:0; transition:opacity .2s}
+.cake .lit .fl{opacity:1}
+.cake .lit .f1{animation:pxa .45s steps(1) infinite}
+.cake .lit .f2{animation:pxb .45s steps(1) infinite}
+@keyframes pxa{50%{opacity:0}}
+@keyframes pxb{0%{opacity:0}50%{opacity:1}}
+.cake.blowing .lit .fl{transform:translateX(-.6px)}
+.cake .glow{opacity:0; transition:opacity .3s}
+.cake .lit .glow{opacity:.5}
+.cake .smoke{opacity:0}
+.cake .smoke.go{animation:smoke 1.2s steps(6) forwards}
+@keyframes smoke{0%{opacity:.8; transform:translateY(0)}100%{opacity:0; transform:translateY(-6px)}}
+.match{position:absolute; left:0; top:0; width:22px; height:84px; pointer-events:none; transition:opacity .4s; will-change:transform; z-index:5}
+.match svg{width:100%; height:100%; overflow:visible}
+.mf{transform-box:fill-box; transform-origin:50% 100%; animation:flick .5s ease-in-out infinite alternate}
+@keyframes flick{0%{transform:scaleY(1)}100%{transform:scaleY(1.15) skewX(3deg)}}
+
+.panel{display:flex; flex-direction:column; gap:12px; align-items:stretch; text-align:left}
+.panel h2{text-align:left}
+.cam{position:relative; width:100%; aspect-ratio:4/3; border-radius:14px; overflow:hidden; background:var(--night); max-width:100%}
+.cam video,.cam canvas{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
+.cam .off{position:absolute; inset:0; display:grid; place-items:center; padding:16px; text-align:center; color:#c9c3e6; font-size:12px; line-height:1.5}
+.status{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted)}
+.status i{width:8px; height:8px; border-radius:50%; background:#cdbac2; flex:none}
+.status.ok i{background:#3aa66b}
+.status.warn i{background:var(--gold)}
+.meter{width:100%; height:8px; border-radius:4px; background:var(--line); overflow:hidden; position:relative}
+.meter i{display:block; height:100%; width:calc(var(--lvl,0) * 100%); background:var(--wine); transition:width .08s}
+.hold{
+  position:relative; overflow:hidden;
+  font:600 14px/1 var(--f-body); color:var(--wine-deep); background:var(--blush);
+  border:0; border-radius:999px; padding:14px 20px; cursor:pointer; touch-action:none;
+}
+.hold .bar{position:absolute; inset:0; background:rgba(155,28,76,.16); transform-origin:left; transform:scaleX(var(--p,0))}
+.hold span{position:relative}
+kbd{font:600 11px/1 var(--f-body); border:1px solid #d9c4cc; border-bottom-width:2px; border-radius:4px; padding:2px 5px; background:#fff; color:var(--ink)}
+
+/* ---------- letter ---------- */
+.letter{text-align:left; width:100%; display:flex; flex-direction:column; gap:10px}
+.letter p{max-width:none; color:var(--ink); font-size:15px}
+.sign{font-family:var(--f-hand); font-weight:700; color:var(--wine); font-size:26px; align-self:flex-end}
+
+/* ---------- pick ---------- */
+.options{display:grid; grid-template-columns:1fr; gap:14px; width:100%}
+@media (min-width:720px){ .options{grid-template-columns:repeat(3, minmax(0,1fr))} }
+.opt{
+  font:inherit; text-align:left; cursor:pointer; color:var(--ink);
+  background:var(--soft); border:1.5px solid transparent; border-radius:18px; padding:12px 12px 16px;
+  display:flex; flex-direction:column; gap:10px; min-width:0;
+  transition:border-color .2s, transform .2s, background .2s;
+}
+.opt:hover{border-color:var(--wine); background:#fff; transform:translateY(-3px)}
+.opt .photo{width:100%; aspect-ratio:1; border-radius:12px}
+.opt b{font-family:var(--f-display); font-size:19px; color:var(--wine); font-weight:700; padding-inline:4px}
+.opt .feel{font-size:13px; line-height:1.5; color:var(--muted); padding-inline:4px}
+.scales{display:grid; gap:5px; padding-inline:4px; margin-top:auto}
+.scale{display:grid; grid-template-columns:62px 1fr; align-items:center; gap:8px; font-size:11px; color:var(--muted); font-weight:600}
+.pips{display:flex; gap:3px}
+.pips i{width:100%; max-width:22px; height:6px; border-radius:2px; background:#ead7df}
+.pips i.on{background:var(--wine)}
+
+/* ---------- final ---------- */
+.chosen{display:flex; flex-direction:column; align-items:center; gap:6px}
+.picker{width:100%; display:flex; flex-direction:column; gap:12px; text-align:left}
+.picker label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700}
+.picker input[type=date]{font:600 15px var(--f-body); color:var(--ink); padding:12px 14px; border-radius:12px; border:1.5px solid var(--line); background:#fff; width:100%}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{font:600 14px/1 var(--f-body); padding:11px 14px; border-radius:999px; border:1.5px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--wine); color:#fff; border-color:var(--wine)}
+.ticket{width:100%; border-radius:16px; background:var(--soft); border:1.5px dashed #d9b9c6; padding:16px; display:grid; gap:6px; text-align:left}
+.ticket div{display:grid; grid-template-columns:90px 1fr; gap:10px}
+.ticket dt{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700; padding-top:2px}
+.ticket dd{margin:0; font-weight:600; min-width:0}
+.share{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+a.yes{text-decoration:none}
+
+#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:100}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important}
+}
+main{position:relative; z-index:2}
+.gallery{position:relative; width:100%; aspect-ratio:4/3; border-radius:14px; overflow:hidden; background:var(--soft)}
+.g-track img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transform:translateY(-40px) rotate(-8deg) scale(.85); transition:opacity .5s, transform .9s cubic-bezier(.3,1.6,.5,1)}
+.g-track img.on{opacity:1; transform:none}
+.g-empty{position:absolute; inset:0; display:grid; place-items:center; font-size:12px; color:#a8899a; border:1.5px dashed #d9b9c6; border-radius:14px}
+.g-nav{position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; border:0; background:rgba(255,255,255,.85); color:var(--wine); font:700 22px/1 var(--f-body); cursor:pointer; display:grid; place-items:center}
+.g-nav.prev{left:10px} .g-nav.next{right:10px}
+.g-dots{position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px}
+.g-dots i{width:7px; height:7px; border-radius:4px; background:rgba(255,255,255,.6); transition:width .3s}
+.g-dots i.on{background:#fff; width:18px}
+.floaters{position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden}
+.floater{position:absolute; width:clamp(140px, 18vw, 260px); border-radius:14px; border:4px solid #fff; box-shadow:0 12px 30px -10px rgba(43,24,32,.35); opacity:0; animation:pop var(--life,4s) ease-in-out forwards}
+@keyframes pop{
+  0%{opacity:0; transform:scale(.3) rotate(var(--r0))}
+  15%{opacity:1; transform:scale(1.08) rotate(var(--r1))}
+  25%{opacity:1; transform:scale(1) rotate(var(--r1))}
+  80%{opacity:1; transform:translateY(-10px) rotate(var(--r2))}
+  100%{opacity:0; transform:translateY(-30px) scale(.6) rotate(var(--r2))}
+}
+.ico-heart{display:inline-block; width:1em; height:1em; fill:var(--wine); vertical-align:-0.14em; margin:0 .1em}
+</style>
+
+<canvas id="confetti"></canvas>
+<div class="floaters" id="floaters" aria-hidden="true"></div>
+<main>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+
+  <!-- 1. Вопрос-ловушка -->
+  <section class="screen card" id="s-ask">
+    <div class="eyebrow">Маленький вопрос</div>
+    <h1>Хочешь подарок?</h1>
+    <p>Не торопись. Отказаться можно. Теоретически.</p>
+    <div class="photo" data-img="ask">Место для мема</div>
+    <div class="row">
+      <button class="yes" id="yes1"><svg viewBox="0 0 24 24" aria-hidden="true" fill-rule="evenodd"><path d="M4 4l4 4h8l4-4v9c0 4-3.6 7-8 7s-8-3-8-7z M8.5 12a1 1 0 102 0 1 1 0 10-2 0z M13.5 12a1 1 0 102 0 1 1 0 10-2 0z"/></svg>Конечно</button>
+      <button class="no" id="no1">Нет</button>
+    </div>
+    <div class="note" id="note1" aria-live="polite"></div>
+  </section>
+
+  <!-- 2. Кот и торт -->
+  <section class="screen card wide" id="s-cake" hidden>
+    <div class="cake-layout">
+      <div class="stage" id="stage">
+        <img class="cat" src="cat.jpg" alt="Кот в праздничной шапочке">
+        <div class="shade"></div>
+        <!-- <div class="hat" aria-hidden="true">
+          <svg viewBox="0 0 100 130">
+            <defs><clipPath id="cone"><path d="M50 10 L92 116 Q50 128 8 116 Z"/></clipPath></defs>
+            <path d="M50 10 L92 116 Q50 128 8 116 Z" fill="#3b5bdb"/>
+            <g clip-path="url(#cone)">
+              <path d="M10 70 L90 50 L95 64 L14 86 Z" fill="#ff6fa5"/>
+              <path d="M18 100 L96 82 L98 96 L22 116 Z" fill="#ffd43b"/>
+              <circle cx="40" cy="48" r="5" fill="#fff"/><circle cx="62" cy="80" r="6" fill="#fff"/><circle cx="34" cy="92" r="4" fill="#69db7c"/><circle cx="55" cy="34" r="3.5" fill="#69db7c"/><circle cx="72" cy="104" r="4" fill="#fff"/>
+            </g>
+            <path d="M4 114 l6 8 l6 -8 l6 8 l6 -8 l6 8 l6 -8 l6 8 l6 -8 l6 8 l6 -8 l6 8 l6 -8 l6 8 l6 -8 l6 8" fill="none" stroke="#ff922b" stroke-width="7" stroke-linejoin="round"/>
+            <path d="M4 114 Q50 128 96 114" fill="none" stroke="#e8590c" stroke-width="3"/>
+            <circle cx="50" cy="9" r="9" fill="#ff6fa5"/><circle cx="47" cy="6" r="3" fill="#fff" fill-opacity=".6"/>
+          </svg>
+        </div> -->
+        <div class="cake" id="cakeBox"><svg id="cake" viewBox="0 0 80 54" shape-rendering="crispEdges" aria-label="Пиксельный торт со свечами"></svg></div>
+        <div class="match" id="match" aria-hidden="true">
+          <svg viewBox="0 0 22 84">
+            <defs><radialGradient id="gFlame" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#fffbe6"/><stop offset=".45" stop-color="#ffd166"/><stop offset="1" stop-color="#f28c28"/></radialGradient></defs>
+            <path class="mf" d="M11 -8 C 17 0, 16 9, 11 10 C 6 9, 5 0, 11 -8 Z" fill="url(#gFlame)"/>
+            <rect x="8.5" y="8" width="5" height="74" rx="2" fill="#e9c891"/>
+            <ellipse cx="11" cy="11" rx="4.8" ry="6" fill="#a3243f"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="eyebrow" id="cakeEyebrow">Сначала свечи</div>
+        <h2 id="cakeTitle">Зажги 23 свечи</h2>
+        <p id="cakeHint">Включи камеру и покажи ладонь. Спичка следует за указательным пальцем. Поднеси её к любой свече, огонь сам побежит по остальным.</p>
+        <div class="cam" id="cam">
+          <video id="video" playsinline muted></video>
+          <canvas id="camCanvas"></canvas>
+          <div class="off" id="camOff">Камера выключена</div>
+        </div>
+        <div class="status" id="status"><i></i><span>Камера и микрофон ещё не включены</span></div>
+        <button class="yes" id="startBtn">Включить камеру и микрофон</button>
+        <div id="blowBox" hidden>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="meter" id="meter"><i></i></div>
+            <button class="hold" id="holdBtn"><span class="bar"></span><span>Или удерживай кнопку или <kbd>Пробел</kbd></span></button>
+          </div>
+        </div>
+        <div class="note" id="fallbackNote">Без камеры спичку можно вести мышкой.</div>
+        <button class="yes" id="toLetter" hidden>Дальше</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Поздравление -->
+  <section class="screen card" id="s-letter" hidden>
+    <div class="eyebrow">Сегодня твой день</div>
+    <h2 id="hbTitle">С днём рождения!</h2>
+    <div class="gallery">
+      <div class="g-track" id="gTrack"></div>
+        <button class="g-nav prev" id="gPrev" aria-label="Предыдущее фото">&#8249;</button>
+        <button class="g-nav next" id="gNext" aria-label="Следующее фото">&#8250;</button>
+      <div class="g-dots" id="gDots"></div>
+    </div>
+    <div class="letter" id="letter"></div>
+    <div class="sign" id="sign"></div>
+    <button class="yes" id="toPick">А теперь еще подарочек</button>
+  </section>
+
+  <!-- 4. Выбор впечатления -->
+  <section class="screen card wide" id="s-pick" hidden>
+    <div class="eyebrow">Подарок</div>
+    <h1>Что хочешь почувствовать?</h1>
+    <p>Три ощущения. Что за ними стоит, узнаешь позже. Выбрать можно одно.</p>
+    <div class="options" id="options"></div>
+    <div class="row" style="min-height:48px"><button class="no" id="no2">Ничего не хочу</button></div>
+    <div class="note" id="note2" aria-live="polite"></div>
+  </section>
+
+  <!-- 5. Финал -->
+  <section class="screen card" id="s-final" hidden>
+    <div class="eyebrow">Выбор сделан</div>
+    <h2>Я так и знала</h2>
+    <div class="chosen"><div class="hand" id="chosenName"></div><p id="chosenHint"></p></div>
+    <div class="picker" id="picker">
+      <label for="dateIn">Выбери день</label>
+      <input type="date" id="dateIn">
+      <label>И время</label>
+      <div class="chips" id="chips"></div>
+      <button class="yes" id="bookBtn" disabled>Бронирую</button>
+    </div>
+    <div id="booked" hidden style="width:100%;display:flex;flex-direction:column;gap:12px;align-items:center">
+      <dl class="ticket" id="ticket" style="margin:0"></dl>
+      <p>Отправь это мне, чтобы я всё забронировала.</p>
+      <div class="share">
+        <a class="yes" id="tgBtn" target="_blank" rel="noopener">Отправить в Telegram</a>
+        <button class="hold" id="copyBtn"><span>Скопировать текст</span></button>
+      </div>
+      <div class="note" id="copyNote" aria-live="polite"></div>
+      <button class="ghost" id="changeBtn">Поменять дату</button>
+    </div>
+    <button class="ghost" id="again">Пройти заново</button>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
+<script>
+/* ===== Всё, что нужно поменять под себя ===== */
+const CONFIG = {
+  name: "Киси Писи",
+  candles: 23,
+  music: "",          // свой файл, например "song.mp3". Пусто - играет встроенная мелодия
+  musicVolume: 0.5,
+  noFirstDelay: 700,  // первый раз: сколько миллисекунд можно держать курсор на "Нет", пока она не убежит
+  noDelay: 250,       // все следующие разы   // громкость от 0 до 1
+  // Своя картинка торта вместо пиксельного: положи файл рядом с index.html и впиши имя, например "cake.png".
+  // cakeTop - где на картинке стоят свечи, в долях от её размера (0 - левый/верхний край, 1 - правый/нижний):
+  // y - линия верха торта, left и right - от какого до какого места по ширине расставить свечи.
+  cakeImage: "pngaaa.com-3195574.png",
+  cakeTopQuad: {
+    backLeft:   [0.50, 0.05],
+    backRight:  [0.97, 0.28],
+    frontRight: [0.50, 0.52],
+    frontLeft:  [0.03, 0.28]
+  },
+  cakeRows: 4,
+  candleScale: 1.5,
+  cakeTop: { y: 0.30, left: 0.18, right: 0.82 },
+  images: { ask: "", letter: "" },   // например "meme1.jpg" - файл кладёшь рядом с index.html
+  letter: [
+    "Киси Писи, с днём рождения!{heart}",
+    "Желаю тебе, чтобы в этом году у тебя было больше счастливых моментов! Чтобы у тебя все складывалось само!",
+    "Лучшего оффера, сбыения всех мечт!",
+    "Чтобы этот год был еще лучше предыдущего, чтобы всё, за что ты берёшься, получалось, и чтобы у тебя было больше поводов радоваться и баловаться!",
+    "Мое любимое число - 23, и моему любимому Кисе тоже 23! Поэтому все будет отлично!!!!!! ",
+    "Люблю тебя {heart}{heart}{heart}"
+  ],
+  gallery: ["photo1.jpg", "photo2.jpg", "photo3.jpg", "photo4.jpg", "photo5.jpg", "photo6.jpg", "photo7.jpg", "photo8.jpg", "photo9.jpg", "photo10.jpg"],  // ваши фото по порядку
+  galleryEvery: 3500,                                     // смена фото, мс
+  floatMemes: ["meme-a.jpg", "cat.gif", "cat-dance-happy-dance-cat.gif", "cats-dance.gif", "uia-uia-cat.gif", "meme-c.jpg"],  // коты по бокам
+  floatEvery: 1200,  
+  askCats: ["cat-0.jpg","cat-1.jpg","cat-2.jpg","cat-3.jpg","cat-4.jpg","cat-5.jpg","cat-6.jpg"],
+  askCatGone: "cat-7.jpg",
+  sign: "от Кисини{heart}",
+  reveal: false,                     // true - в финале показать, что это на самом деле
+  times: ["11:00","13:00","15:00","17:00","19:00"],
+  options: [
+    { id:"plane", title:"Крутость", real:"Авиасимулятор",
+      feel:"Сложноб высота? Управляй через какие облака ты пролетишь))Добро пожаловать на борт КисиЭйр",
+      hint:"Надень удобную обувь.", scales:[2,4,2], img:"pilot.jpg" },
+    { id:"massage", title:"Релакс", real:"Массаж",
+      feel:"Плечи забывают про ноутбук, телефон где-то далеко... Но без хэппиэндов!",
+      hint:"Ничего брать не нужно, только себя.", scales:[1,0,5], img:"images.jpg" },
+    { id:"drift", title:"Адреналин", real:"Дрифт-такси",
+      feel:"Мир разворачивается боком. Это такси кажется криво едет...",
+      hint:"Плотно позавтракай. Или нет....", scales:[5,5,0], img:"images (1).jpg" }
+  ]
+                                       // как часто появляется новый мем, мс
+};
+
+const $ = s => document.querySelector(s);
+const screens = ["s-ask","s-cake","s-letter","s-pick","s-final"];
+const dots = $("#dots");
+screens.forEach(()=>dots.appendChild(document.createElement("i")));
+function show(id){
+  screens.forEach((s,i)=>{ $("#"+s).hidden = s!==id; dots.children[i].classList.toggle("on", s===id); });
+    id === "s-letter" ? startFloaters() : stopFloaters();
+  window.scrollTo({top:0, behavior:"smooth"});
+  if(id==="s-cake") requestAnimationFrame(()=>moveMatch(stage.clientWidth*.85, stage.clientHeight*.3));
+}
+function fillPhoto(box, src){ if(!src) return; box.textContent=""; box.classList.add("has-img"); const i=new Image(); i.src=src; i.alt=""; box.appendChild(i); }
+document.querySelectorAll("[data-img]").forEach(b=>fillPhoto(b, CONFIG.images[b.dataset.img]));
+show("s-ask");
+
+/* ===== Убегающая кнопка ===== */
+function runaway(no, yes, note, phrases, giveUpText, onChange){
+  let tries = 0, freed = false;
+  function flee(px, py){
+    tries++;
+    if(tries >= phrases.length){ no.hidden = true; note.textContent = giveUpText; yes.style.setProperty("--grow", 1.18); onChange && onChange(tries, true); return; }
+    if(!freed){
+      const r = no.getBoundingClientRect();
+      const sp = document.createElement("span");
+      sp.className = "spacer"; sp.style.width = r.width+"px"; sp.style.height = r.height+"px";
+      no.after(sp);
+      no.classList.add("free"); no.style.left = r.left+"px"; no.style.top = r.top+"px";
+      no.getBoundingClientRect(); freed = true;
+    }
+    no.textContent = phrases[tries];
+    onChange && onChange(tries, false);
+    const b = no.getBoundingClientRect(), y = yes.getBoundingClientRect();
+    const W = innerWidth, H = innerHeight, m = 20;
+    let best = null;
+    for(let i=0;i<30;i++){
+      const x = m + Math.random()*(W - b.width - m*2);
+      const t = m + Math.random()*(H - b.height - m*2);
+      const hitsYes = x < y.right+12 && x+b.width > y.left-12 && t < y.bottom+12 && t+b.height > y.top-12;
+      const d = Math.hypot(x+b.width/2-(px??b.left), t+b.height/2-(py??b.top));
+      if(!hitsYes && d > 180){ best = [x,t]; break; }
+      if(!hitsYes && !best) best = [x,t];
+    }
+    if(best){ no.style.left = best[0]+"px"; no.style.top = best[1]+"px"; }
+    no.style.transform = `scale(${Math.max(.7, 1 - tries*.04)})`;
+    yes.style.setProperty("--grow", (1 + tries*.05).toFixed(2));
+  }
+  no.addEventListener("pointerdown", e=>{ e.preventDefault(); flee(e.clientX, e.clientY); });
+  no.addEventListener("click", e=>{ e.preventDefault(); flee(); });
+  let hoverTimer = 0;
+  no.addEventListener("pointerenter", e=>{
+    if(e.pointerType !== "mouse") return;
+    clearTimeout(hoverTimer);
+    if(tries > 0) return;
+    const delay = CONFIG.noFirstDelay ?? 700;
+    hoverTimer = setTimeout(()=>flee(e.clientX, e.clientY), delay);
+  });
+  no.addEventListener("pointerleave", ()=> clearTimeout(hoverTimer));
+  return ()=>{ onChange && onChange(0, false); tries=0; freed=false; no.hidden=false; no.classList.remove("free"); no.style.cssText=""; no.textContent=phrases[0]; note.textContent=""; yes.style.setProperty("--grow",1); if(no.nextElementSibling?.classList.contains("spacer")) no.nextElementSibling.remove(); };
+}
+function setAskCat(i, gone){
+  const list = CONFIG.askCats; if(!list || !list.length) return;
+  const src = gone ? (CONFIG.askCatGone || list[list.length-1]) : list[Math.min(i, list.length-1)];
+  const box = document.querySelector('[data-img="ask"]');
+  let img = box.querySelector("img");
+  if(!img){ box.textContent = ""; box.classList.add("has-img"); img = new Image(); img.alt = ""; box.appendChild(img); }
+  img.src = src;
+}
+(CONFIG.askCats || []).concat(CONFIG.askCatGone || []).forEach(s => { new Image().src = s; });
+setAskCat(0, false);
+const reset1 = runaway($("#no1"), $("#yes1"), $("#note1"),
+  ["Нет","Точно ма?","Ошибся кнопкой?","Ну попробуй","Мимо","Ты серьезно? ДА, сиёзна","Кнопка устала"],
+  "Кнопка «Нет» сбежала насовсем. Остался один вариант.", setAskCat);
+const reset2 = runaway($("#no2"), $("#options"), $("#note2"),
+  ["Ничего не хочу","Серьёзно?","Не выйдет","Даже не пытайся","Ты же хочешь","Последний шанс","Всё, я ушла"],
+  "Отказ не принимается. Выбирай.");
+$("#yes1").onclick = ()=>show("s-cake");
+
+/* ===== Пиксельный торт ===== */
+const NS="http://www.w3.org/2000/svg", cake=$("#cake"), cakeBox=$("#cakeBox");
+const px=(p,x,y,w,h,c,cls)=>{ const r=document.createElementNS(NS,"rect"); r.setAttribute("x",x); r.setAttribute("y",y); r.setAttribute("width",w); r.setAttribute("height",h); r.setAttribute("fill",c); if(cls) r.setAttribute("class",cls); p.appendChild(r); return r; };
+const grp=(p,cls)=>{ const g=document.createElementNS(NS,"g"); if(cls) g.setAttribute("class",cls); p.appendChild(g); return g; };
+function drawCake(){
+  // подставка
+  px(cake,1,50,78,2,"#8f7fd1"); px(cake,3,52,74,2,"#6c5fb0"); px(cake,0,49,80,1,"#b3a7ea");
+  // корпус со ступенчатыми углами
+  const L=4, R=76;
+  px(cake,L,26,R-L,23,"#d9824a");
+  px(cake,L,26,1,1,"transparent");
+  px(cake,L,30,R-L,3,"#ffe08a"); px(cake,L,33,R-L,1,"#e9b24a");
+  px(cake,L,40,R-L,3,"#ff9ec4"); px(cake,L,43,R-L,1,"#e27aa3");
+  px(cake,L,47,R-L,2,"#b8613a");
+  // тени и блики по краям корпуса
+  px(cake,L,26,2,23,"#e89a62"); px(cake,R-2,26,2,23,"#b8613a");
+  // глазурь сверху и подтёки
+  px(cake,L-1,22,R-L+2,4,"#fff1f6"); px(cake,L,21,R-L,1,"#ffffff"); px(cake,L-1,25,R-L+2,1,"#ffd0e2");
+  [[6,3],[10,5],[15,2],[19,6],[25,3],[30,4],[36,7],[41,3],[46,5],[52,2],[57,6],[62,3],[67,5],[72,3]].forEach(([x,h])=>{ px(cake,x,26,3,h,"#fff1f6"); px(cake,x+2,26,1,h,"#ffd0e2"); px(cake,x,26+h,3,1,"#ffd0e2"); });
+  // посыпка
+  [[8,23,"#ff5c8a"],[14,24,"#4dabf7"],[21,23,"#69db7c"],[29,24,"#ffd43b"],[37,23,"#b197fc"],[45,24,"#ff922b"],[53,23,"#4dabf7"],[60,24,"#ff5c8a"],[68,23,"#69db7c"],[73,24,"#ffd43b"]].forEach(([x,y,c])=>px(cake,x,y,1,1,c));
+  // имя
+  const t=document.createElementNS(NS,"text"); t.setAttribute("x",40); t.setAttribute("y",38.6); t.setAttribute("text-anchor","middle");
+  t.setAttribute("font-family","Pixelify Sans, monospace"); t.setAttribute("font-weight","600"); t.setAttribute("font-size","5.4"); t.setAttribute("fill","#fff8ee");
+  t.textContent=CONFIG.name.toUpperCase(); cake.appendChild(t);
+}
+const N = Math.max(1, Math.min(23, CONFIG.candles));
+const colors=["#ff8fb8","#74c0fc","#ffe066","#8ce99a","#d0bfff"];
+const wicks = [];
+function addCandle(x, base){
+  const i = wicks.length, s = CONFIG.candleScale || 1;
+  const h = (i%2 ? 7 : 8) * s, top = base - h;
+  const g = grp(cake,"candle");
+  px(g, x, top, s, h, colors[i%colors.length]);
+  px(g, x, top + 2*s, s, s, "#ffffff"); px(g, x, top + 5*s, s, s, "#ffffff");
+  px(g, x, top - s, s, s, "#4a3a33");
+  const f = grp(g,"fl");
+  px(f, x, top - 3*s, s, 2*s, "#ffd166","f1"); px(f, x, top - 2*s, s, s, "#ff8c28","f1");
+  px(f, x, top - 4*s, s, 3*s, "#ffe9a3","f2"); px(f, x, top - 2*s, s, s, "#ff6b2c","f2");
+  const sm = px(g, x, top - 4*s, s, s, "#c9c3d6","smoke");
+  g.addEventListener("click", ()=>{ if(phase==="light") light(i); });
+  wicks.push({g, sm, svgX: x + s/2, svgY: top - 1.5*s, lit:false});
+}
+function buildCandles(x0, x1, base){
+  for(let i=0;i<N;i++) addCandle(x0 + i*(x1-x0)/(N-1||1), base);
+}
+function buildCandlesQuad(H){
+  const q = CONFIG.cakeTopQuad, R = CONFIG.cakeRows || 4;
+  const P = k => [q[k][0]*80, q[k][1]*H];
+  const A = P("backLeft"), B = P("backRight"), C = P("frontRight"), D = P("frontLeft");
+  const perRow = Math.ceil(N / R);
+  let placed = 0;
+  for(let r=0; r<R && placed<N; r++){
+    const v = (r + 0.5) / R;
+    const cnt = Math.min(perRow, N - placed);
+    for(let c=0; c<cnt; c++){
+      const u = (c + 0.5) / cnt;
+      const x = (1-v)*((1-u)*A[0] + u*B[0]) + v*((1-u)*D[0] + u*C[0]);
+      const y = (1-v)*((1-u)*A[1] + u*B[1]) + v*((1-u)*D[1] + u*C[1]);
+      addCandle(x, y); placed++;
+    }
+  }
+}
+if(CONFIG.cakeImage){
+  const im = new Image();
+  im.onload = ()=>{
+    const H = 80*im.naturalHeight/im.naturalWidth;
+    cake.setAttribute("viewBox", `0 0 80 ${H}`);
+    const el = document.createElementNS(NS,"image");
+    el.setAttribute("href", CONFIG.cakeImage); el.setAttribute("width", 80); el.setAttribute("height", H);
+    cake.prepend(el);
+    if(CONFIG.cakeTopQuad) buildCandlesQuad(H);
+    else buildCandles(CONFIG.cakeTop.left*80, CONFIG.cakeTop.right*80, CONFIG.cakeTop.y*H);
+  };
+  im.onerror = ()=>{ drawCake(); buildCandles(7, 73, 21); console.warn("Не нашла картинку торта:", CONFIG.cakeImage); };
+  im.src = CONFIG.cakeImage;
+} else { drawCake(); buildCandles(7, 73, 21); }
+
+let phase = "light";
+const stage = $("#stage"), match = $("#match");
+function plural(n,a,b,c){ const m=n%10, h=n%100; return m===1&&h!==11?a:(m>=2&&m<=4&&(h<12||h>14)?b:c); }
+function wickPx(w){
+  const s=stage.getBoundingClientRect(), c=cake.getBoundingClientRect(), k=c.width/80;
+  return [c.left-s.left + w.svgX*k, c.top-s.top + w.svgY*k, k];
+}
+function moveMatch(x, y){
+  match.style.transform = `translate(${x-11}px, ${y}px) rotate(-12deg)`;
+  if(phase!=="light") return;
+  for(let i=0;i<wicks.length;i++){ const w=wicks[i]; if(w.lit) continue; const [wx,wy,k]=wickPx(w); if(Math.hypot(x-wx, y-wy) < Math.max(14, k*3)) light(i); }
+}
+function light(i){
+  const w = wicks[i]; if(!w || w.lit || phase!=="light") return;
+  w.lit = true; w.g.classList.add("lit");
+  // огонь бежит по фитилям как по бикфордову шнуру
+  [i-1,i+1].forEach(j=>{ if(wicks[j] && !wicks[j].lit) setTimeout(()=>light(j), 90); });
+  if(wicks.every(w=>w.lit)) setTimeout(allLit, 400);
+}
+function allLit(){
+  if(phase!=="light") return;
+  phase = "blow"; stage.classList.add("dark");
+  startMusic();
+  match.style.opacity = 0;
+  $("#cakeEyebrow").textContent = "Свечи горят";
+  $("#cakeTitle").textContent = "Загадай желание";
+  $("#cakeHint").textContent = mic ? "И задуй свечи. Подуй прямо в ноутбук: чем сильнее, тем быстрее гаснут." : "И задуй свечи. Включи микрофон кнопкой ниже или удерживай пробел.";
+  $("#blowBox").hidden = false;
+  $("#startBtn").hidden = !!mic;
+  if(!mic) $("#startBtn").textContent = "Включить микрофон";
+}
+stage.addEventListener("pointermove", e=>{
+  if(handActive) return;
+  const r = stage.getBoundingClientRect();
+  moveMatch(e.clientX-r.left, e.clientY-r.top);
+});
+
+/* ===== Камера + рука (MediaPipe Hands) + микрофон ===== */
+let cam=null, mic=null, hands=null, handActive=false, lastSeen=0, smooth=null;
+const video=$("#video"), cc=$("#camCanvas"), cctx=cc.getContext("2d");
+function setStatus(text, kind){ const s=$("#status"); s.className="status "+(kind||""); s.querySelector("span").textContent=text; }
+$("#startBtn").onclick = async ()=>{
+  $("#startBtn").disabled = true;
+  const wantVideo = !cam && phase==="light";
+  const audio = mic ? false : {echoCancellation:true, noiseSuppression:false, autoGainControl:false};
+  let stream=null;
+  try{ stream = await navigator.mediaDevices.getUserMedia({video: wantVideo ? {width:640,height:480,facingMode:"user"} : false, audio}); }
+  catch(e){ if(audio){ try{ stream = await navigator.mediaDevices.getUserMedia({audio}); }catch(e2){} } }
+  $("#startBtn").disabled = false;
+  if(!stream){ setStatus("Браузер не дал доступ к камере и микрофону. Спичку веди мышкой, свечи задувай пробелом.", "warn"); $("#startBtn").hidden = true; return; }
+  if(stream.getAudioTracks().length && !mic) startMic(stream);
+  if(stream.getVideoTracks().length) await startCam(stream);
+  else if(wantVideo) setStatus("Камера недоступна, микрофон работает. Спичку веди мышкой.", "warn");
+  $("#startBtn").hidden = !!(mic && (cam || phase!=="light"));
+};
+async function startCam(stream){
+  cam = stream; video.srcObject = stream; await video.play().catch(()=>{});
+  $("#camOff").hidden = true;
+  setStatus("Загружаю распознавание руки...", "");
+  try{
+    if(typeof Hands==="undefined") throw new Error("no lib");
+    hands = new Hands({locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${f}`});
+    hands.setOptions({maxNumHands:1, modelComplexity:1, minDetectionConfidence:.7, minTrackingConfidence:.5});
+    hands.onResults(onHands);
+    await Promise.race([hands.initialize(), new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")), 20000))]);
+    setStatus("Камера работает. Покажи ладонь.", "ok");
+    let busy=false;
+    (async function loop(){
+      if(!cam) return;
+      if(!busy && video.readyState>=2 && phase==="light"){ busy=true; try{ await hands.send({image:video}); }catch(e){} busy=false; }
+      requestAnimationFrame(loop);
+    })();
+  }catch(e){ setStatus("Распознавание руки не загрузилось. Спичку веди мышкой.", "warn"); }
+}
+function onHands(res){
+  cc.width = video.videoWidth||640; cc.height = video.videoHeight||480;
+  cctx.clearRect(0,0,cc.width,cc.height);
+  const lm = res.multiHandLandmarks && res.multiHandLandmarks[0];
+  if(!lm){ if(performance.now()-lastSeen>600) handActive=false; return; }
+  lastSeen = performance.now(); handActive = true;
+  cctx.fillStyle="rgba(255,255,255,.7)";
+  lm.forEach(p=>{ cctx.beginPath(); cctx.arc(p.x*cc.width, p.y*cc.height, 3, 0, 7); cctx.fill(); });
+  const tip = lm[8];
+  cctx.fillStyle="#ffd166"; cctx.beginPath(); cctx.arc(tip.x*cc.width, tip.y*cc.height, 7, 0, 7); cctx.fill();
+  const nx = Math.min(1, Math.max(0, ((1-tip.x) - .15)/.7));
+  const ny = Math.min(1, Math.max(0, (tip.y - .1)/.7));
+  const tx = nx*stage.clientWidth, ty = ny*stage.clientHeight;
+  smooth = smooth ? {x:smooth.x+(tx-smooth.x)*.45, y:smooth.y+(ty-smooth.y)*.45} : {x:tx,y:ty};
+  moveMatch(smooth.x, smooth.y);
+  setStatus("Вижу руку. Веди спичку к свечам.", "ok");
+}
+function startMic(stream){
+  const ac = new (window.AudioContext||window.webkitAudioContext)();
+  const an = ac.createAnalyser(); an.fftSize = 1024;
+  ac.createMediaStreamSource(new MediaStream(stream.getAudioTracks())).connect(an);
+  const buf = new Float32Array(an.fftSize);
+  mic = {stream, ac, raf:0, noise:.02, t0:performance.now(), acc:0, last:performance.now()};
+  const loop = (t)=>{
+    if(!mic) return;
+    an.getFloatTimeDomainData(buf);
+    let s=0; for(const v of buf) s+=v*v;
+    const rms = Math.sqrt(s/buf.length);
+    if(t - mic.t0 < 800) mic.noise = Math.max(mic.noise, rms);
+    const thr = Math.max(.07, mic.noise*3), lvl = Math.min(1, rms/(thr*2.2));
+    $("#meter").style.setProperty("--lvl", lvl.toFixed(2));
+    const dt = t - mic.last; mic.last = t;
+    if(phase==="blow"){
+      cakeBox.classList.toggle("blowing", rms > thr);
+      if(rms > thr){ mic.acc += dt*(1+lvl*2); while(mic.acc > 140){ mic.acc -= 140; blowOne(); } }
+      else mic.acc = Math.max(0, mic.acc - dt);
+    }
+    mic.raf = requestAnimationFrame(loop);
+  };
+  mic.raf = requestAnimationFrame(loop);
+  if(phase==="blow") $("#cakeHint").textContent = "Подуй прямо в ноутбук: чем сильнее, тем быстрее гаснут.";
+}
+function stopAll(){
+  if(mic){ cancelAnimationFrame(mic.raf); mic.stream.getTracks().forEach(t=>t.stop()); mic.ac.close(); mic=null; }
+  if(cam){ cam.getTracks().forEach(t=>t.stop()); cam=null; }
+  handActive=false; $("#camOff").hidden=false;
+}
+
+/* ===== Задувание ===== */
+function blowOne(){
+  const lit = wicks.filter(w=>w.lit); if(!lit.length) return;
+  const w = lit[Math.floor(Math.random()*lit.length)];
+  w.lit = false; w.g.classList.remove("lit");
+  w.sm.classList.remove("go"); w.sm.getBoundingClientRect(); w.sm.classList.add("go");
+  if(!wicks.some(w=>w.lit)) allOut();
+}
+function allOut(){
+  stopMusic();
+  phase = "done"; cakeBox.classList.remove("blowing"); stopHold(); stopAll(); stage.classList.remove("dark");
+  $("#blowBox").hidden = true; $("#startBtn").hidden = true; $("#fallbackNote").hidden = true;
+  setStatus("Камера и микрофон выключены", "");
+  $("#cakeEyebrow").textContent = "Желание загадано";
+  $("#cakeTitle").textContent = `С днём рождения, ${CONFIG.name}!`;
+  $("#cakeHint").textContent = "Оно обязательно сбудется.";
+  confettiRain(); setTimeout(()=>$("#toLetter").hidden=false, 900);
+}
+
+let hold=null; const hb=$("#holdBtn");
+function startHold(e){
+  if(phase!=="blow" || hold) return; e && e.preventDefault();
+  hold = {raf:0, last:performance.now(), acc:0, t0:performance.now()};
+  cakeBox.classList.add("blowing");
+  const loop=(t)=>{
+    if(!hold) return;
+    hb.style.setProperty("--p", Math.min(1,(t-hold.t0)/1900));
+    hold.acc += t-hold.last; hold.last=t;
+    while(hold && hold.acc > 80){ hold.acc-=80; blowOne(); }
+    if(hold) hold.raf = requestAnimationFrame(loop);
+  };
+  hold.raf = requestAnimationFrame(loop);
+}
+function stopHold(){ if(!hold) return; cancelAnimationFrame(hold.raf); hold=null; hb.style.setProperty("--p",0); cakeBox.classList.remove("blowing"); }
+hb.addEventListener("pointerdown", startHold);
+["pointerup","pointerleave","pointercancel"].forEach(t=>hb.addEventListener(t, stopHold));
+document.addEventListener("keydown", e=>{ if(e.code==="Space" && phase==="blow"){ e.preventDefault(); if(!e.repeat) startHold(); }});
+document.addEventListener("keyup", e=>{ if(e.code==="Space") stopHold(); });
+
+/* ===== Поздравление ===== */
+$("#hbTitle").textContent = `С днём рождения, ${CONFIG.name}!`;
+function withHearts(el, text){
+  text.split("{heart}").forEach((part, i, arr)=>{
+    el.appendChild(document.createTextNode(part));
+    if(i < arr.length - 1){
+      const s = document.createElementNS("http://www.w3.org/2000/svg","svg");
+      s.setAttribute("viewBox","0 0 24 24"); s.setAttribute("class","ico-heart"); s.setAttribute("aria-hidden","true");
+      s.innerHTML = '<path d="M12 21s-7.5-4.6-9.7-9.3C.8 8.4 2.7 4.5 6.5 4.5c2.2 0 3.6 1.2 4.5 2.6.9-1.4 2.3-2.6 4.5-2.6 3.8 0 5.7 3.9 4.2 7.2C19.5 16.4 12 21 12 21z"/>';
+      el.appendChild(s);
+    }
+  });
+}
+CONFIG.letter.forEach(t=>{ const p=document.createElement("p"); withHearts(p, t); $("#letter").appendChild(p); });
+withHearts($("#sign"), CONFIG.sign);
+$("#toLetter").onclick = ()=>show("s-letter");
+$("#toPick").onclick = ()=>show("s-pick");
+
+/* ===== Выбор ===== */
+const scaleNames=["Пульс","Шум","Покой"];
+let chosen=null;
+CONFIG.options.forEach(o=>{
+  const b=document.createElement("button"); b.className="opt"; b.type="button";
+  const ph=document.createElement("div"); ph.className="photo"; ph.textContent="Место для котика"; fillPhoto(ph,o.img);
+  const t=document.createElement("b"); t.textContent=o.title;
+  const f=document.createElement("div"); f.className="feel"; f.textContent=o.feel;
+  const sc=document.createElement("div"); sc.className="scales";
+  o.scales.forEach((v,k)=>{ const r=document.createElement("div"); r.className="scale"; r.innerHTML=`<span>${scaleNames[k]}</span><span class="pips">${[0,1,2,3,4].map(n=>`<i class="${n<v?"on":""}"></i>`).join("")}</span>`; sc.appendChild(r); });
+  b.append(ph,t,f,sc);
+  b.onclick=()=>pick(o);
+  $("#options").appendChild(b);
+});
+
+/* ===== Финал: дата и время ===== */
+let when={date:"", time:""};
+const dateIn=$("#dateIn");
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+dateIn.min = iso(new Date());
+CONFIG.times.forEach(t=>{
+  const c=document.createElement("button"); c.type="button"; c.className="chip"; c.textContent=t; c.setAttribute("aria-pressed","false");
+  c.onclick=()=>{ document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false")); c.setAttribute("aria-pressed","true"); when.time=t; check(); };
+  $("#chips").appendChild(c);
+});
+dateIn.addEventListener("input", ()=>{ when.date=dateIn.value; check(); });
+function check(){ $("#bookBtn").disabled = !(when.date && when.time); }
+function nice(d){ const [y,m,dd]=d.split("-").map(Number); return new Date(y,m-1,dd).toLocaleDateString("ru-RU",{weekday:"long", day:"numeric", month:"long"}); }
+function pick(o){
+  chosen=o;
+  $("#chosenName").textContent = CONFIG.reveal ? `${o.title}: ${o.real}` : `${o.title}`;
+  $("#chosenHint").textContent = o.hint;
+  $("#picker").hidden=false; $("#booked").hidden=true;
+  show("s-final"); confetti();
+}
+$("#bookBtn").onclick=()=>{
+  const rows=[["Ощущение",chosen.title],["День",nice(when.date)],["Время",when.time]];
+  const tk=$("#ticket"); tk.innerHTML="";
+  rows.forEach(([k,v])=>{ const d=document.createElement("div"), dt=document.createElement("dt"), dd=document.createElement("dd"); dt.textContent=k; dd.textContent=v; d.append(dt,dd); tk.appendChild(d); });
+  const text=`Я выбрал: ${chosen.title}. ${nice(when.date)}, ${when.time}. Бронируй!`;
+  $("#tgBtn").href = "https://t.me/share/url?url="+encodeURIComponent(location.href.split("#")[0])+"&text="+encodeURIComponent(text);
+  $("#copyBtn").onclick = async ()=>{
+    try{ await navigator.clipboard.writeText(text); $("#copyNote").textContent="Скопировано. Вставь мне в чат."; }
+    catch(e){ $("#copyNote").textContent=text; }
+  };
+  $("#picker").hidden=true; $("#booked").hidden=false; $("#copyNote").textContent="";
+};
+$("#changeBtn").onclick=()=>{ $("#picker").hidden=false; $("#booked").hidden=true; };
+
+$("#again").onclick = ()=>{
+  reset1(); reset2(); phase="light"; stopAll(); smooth=null;
+  wicks.forEach(w=>{w.lit=false; w.g.classList.remove("lit");});
+  match.style.opacity=1; stage.classList.remove("dark");
+  $("#toLetter").hidden=true; $("#blowBox").hidden=true; $("#fallbackNote").hidden=false;
+  const sb=$("#startBtn"); sb.hidden=false; sb.textContent="Включить камеру и микрофон";
+  setStatus("Камера и микрофон ещё не включены","");
+  $("#cakeEyebrow").textContent="Сначала свечи"; $("#cakeTitle").textContent=`Зажги ${N} ${plural(N,"свечу","свечи","свечей")}`;
+  $("#cakeHint").textContent="Включи камеру и покажи ладонь. Спичка следует за указательным пальцем. Поднеси её к любой свече, огонь сам побежит по остальным.";
+  when={date:"",time:""}; dateIn.value=""; document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false")); check();
+  show("s-ask");
+};
+
+/* ===== Конфетти ===== */
+function confetti(){
+  const c = $("#confetti"), x = c.getContext("2d"), dpr = devicePixelRatio||1;
+  c.width = innerWidth*dpr; c.height = innerHeight*dpr; x.setTransform(dpr,0,0,dpr,0,0);
+  const cols = ["#9b1c4c","#ff8fb8","#ffe066","#74c0fc","#8ce99a","#d0bfff"];
+  const n = matchMedia("(prefers-reduced-motion: reduce)").matches ? 30 : 180;
+  const ps = Array.from({length:n},()=>({x:innerWidth/2+(Math.random()-.5)*160, y:innerHeight*.35, vx:(Math.random()-.5)*16, vy:-Math.random()*14-4, r:Math.random()*6+4, a:Math.random()*6, va:(Math.random()-.5)*.3, c:cols[Math.floor(Math.random()*cols.length)]}));
+  let f=0;
+  (function tick(){
+    x.clearRect(0,0,innerWidth,innerHeight);
+    ps.forEach(p=>{ p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va;
+      x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.fillStyle=p.c; x.fillRect(-p.r/2,-p.r/2,p.r,p.r); x.restore(); });
+    if(++f < 260) requestAnimationFrame(tick); else x.clearRect(0,0,innerWidth,innerHeight);
+  })();
+}
+function confettiRain(seconds = 6){
+  const c = $("#confetti"), x = c.getContext("2d"), dpr = devicePixelRatio || 1;
+  const W = innerWidth, H = innerHeight;
+  c.width = W*dpr; c.height = H*dpr; x.setTransform(dpr,0,0,dpr,0,0);
+  const cols = ["#9b1c4c","#ff8fb8","#ffe066","#74c0fc","#8ce99a","#d0bfff","#ff922b"];
+  const few = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const n = few ? 60 : 350;
+  const make = (startTop) => ({
+    x: Math.random()*W,
+    y: startTop ? -Math.random()*H : -20,
+    vy: 1.5 + Math.random()*3,
+    sway: Math.random()*6.28, swaySpeed: .02 + Math.random()*.04,
+    r: 5 + Math.random()*7, a: Math.random()*6.28, va: (Math.random()-.5)*.2,
+    c: cols[Math.floor(Math.random()*cols.length)], round: Math.random() < .3
+  });
+  const ps = Array.from({length:n}, () => make(true));
+  const end = performance.now() + seconds*1000;
+  (function tick(t){
+    x.clearRect(0,0,W,H);
+    let alive = 0;
+    ps.forEach((p,i)=>{
+      p.y += p.vy; p.sway += p.swaySpeed; p.a += p.va;
+      const px = p.x + Math.sin(p.sway)*30;
+      if(p.y > H + 20){ if(performance.now() < end) ps[i] = make(false); else return; }
+      alive++;
+      x.save(); x.translate(px, p.y); x.rotate(p.a); x.fillStyle = p.c;
+      if(p.round){ x.beginPath(); x.arc(0,0,p.r/2.5,0,7); x.fill(); }
+      else x.fillRect(-p.r/2, -p.r/4, p.r, p.r/2);
+      x.restore();
+    });
+    if(alive) requestAnimationFrame(tick); else x.clearRect(0,0,W,H);
+  })(performance.now());
+}
+let music = null;
+function startMusic(){
+  if(music) return;
+  const vol = CONFIG.musicVolume ?? .5;
+  if(CONFIG.music){
+    const a = new Audio(CONFIG.music); a.loop = true; a.volume = vol;
+    a.play().catch(()=>{});
+    music = { stop(){ let v = a.volume; const iv = setInterval(()=>{ v -= .05; if(v <= 0){ a.pause(); clearInterval(iv); } else a.volume = v; }, 60); } };
+    return;
+  }
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const master = ac.createGain(); master.gain.value = .25 * vol; master.connect(ac.destination);
+  const F = {G4:392, A4:440, B4:493.88, C5:523.25, D5:587.33, E5:659.25, F5:698.46, G5:783.99};
+  const song = [["G4",.75],["G4",.25],["A4",1],["G4",1],["C5",1],["B4",2],
+                ["G4",.75],["G4",.25],["A4",1],["G4",1],["D5",1],["C5",2],
+                ["G4",.75],["G4",.25],["G5",1],["E5",1],["C5",1],["B4",1],["A4",2],
+                ["F5",.75],["F5",.25],["E5",1],["C5",1],["D5",1],["C5",2],[null,1]];
+  const beat = .38;
+  let t = ac.currentTime + .1, timer = 0;
+  function play(){
+    const start = t;
+    song.forEach(([n, d])=>{
+      if(n){
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = "square"; o.frequency.value = F[n];
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(1, t + .01);
+        g.gain.setValueAtTime(1, t + d*beat*.8);
+        g.gain.linearRampToValueAtTime(0, t + d*beat*.95);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t + d*beat);
+      }
+      t += d*beat;
+    });
+    timer = setTimeout(play, (t - start - .3) * 1000);
+  }
+  play();
+  music = { stop(){ clearTimeout(timer); master.gain.linearRampToValueAtTime(0, ac.currentTime + 1); setTimeout(()=>ac.close(), 1200); } };
+}
+function stopMusic(){ if(music){ music.stop(); music = null; } }
+(function initGallery(){
+  const list = CONFIG.gallery || [], track = $("#gTrack"), dots = $("#gDots");
+  if(!list.length){ $("#gPrev").hidden = true; $("#gNext").hidden = true; track.innerHTML = '<div class="g-empty">Место для ваших фото</div>'; return; }
+  const imgs = list.map(src => { const i = new Image(); i.src = src; i.alt = ""; track.appendChild(i); dots.appendChild(document.createElement("i")); return i; });
+  let cur = 0, timer = 0;
+  const go = n => {
+    cur = (n + list.length) % list.length;
+    imgs.forEach((im,k) => { im.classList.toggle("out", im.classList.contains("on") && k !== cur); im.classList.toggle("on", k === cur); });
+    setTimeout(() => imgs.forEach(im => { if(!im.classList.contains("on")) { im.style.transition = "none"; im.classList.remove("out"); im.offsetWidth; im.style.transition = ""; } }), 300  );
+    [...dots.children].forEach((d,k) => d.classList.toggle("on", k === cur));
+    clearInterval(timer); timer = setInterval(() => go(cur + 1), CONFIG.galleryEvery ?? 3500);
+  };
+  $("#gPrev").onclick = () => go(cur - 1);
+  $("#gNext").onclick = () => go(cur + 1);
+  if(list.length < 2){ $("#gPrev").hidden = true; $("#gNext").hidden = true; dots.hidden = true; }
+  go(0);
+})();
+
+var floatTimer = 0, floatIdx = 0;
+function spawnFloater(){
+  const list = CONFIG.floatMemes || []; if(!list.length) return;
+  const card = $("#s-letter").getBoundingClientRect();
+  const w = Math.min(160, Math.max(90, innerWidth * .12));
+  const leftRoom = card.left - 16, rightRoom = innerWidth - card.right - 16;
+  const sides = [];
+  if(leftRoom > w * .6) sides.push(() => 8 + Math.random() * Math.max(0, leftRoom - w));
+  if(rightRoom > w * .6) sides.push(() => card.right + 8 + Math.random() * Math.max(0, rightRoom - w));
+  const x = sides.length ? sides[Math.floor(Math.random() * sides.length)]() : Math.random() * (innerWidth - w);
+  const y = 20 + Math.random() * Math.max(0, innerHeight - w * 1.3 - 40);
+  const life = 3.5 + Math.random() * 2;
+  const img = new Image(); img.src = list[floatIdx++ % list.length]; img.className = "floater"; img.alt = "";
+  img.style.left = x + "px"; img.style.top = y + "px";
+  img.style.setProperty("--life", life + "s");
+  const r = () => (Math.random() * 24 - 12).toFixed(1) + "deg";
+  img.style.setProperty("--r0", r()); img.style.setProperty("--r1", r()); img.style.setProperty("--r2", r());
+  $("#floaters").appendChild(img);
+  setTimeout(() => img.remove(), life * 1000 + 100);
+}
+function startFloaters(){ stopFloaters(); spawnFloater(); floatTimer = setInterval(spawnFloater, CONFIG.floatEvery ?? 1200); }
+function stopFloaters(){ clearInterval(floatTimer); const f = $("#floaters"); if(f) f.innerHTML = ""; }
+</script>
+
+</body>
+</html>
